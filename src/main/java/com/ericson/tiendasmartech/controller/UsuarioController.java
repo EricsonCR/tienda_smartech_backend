@@ -25,6 +25,16 @@ public class UsuarioController {
         return ResponseEntity.ok(controllerResponse);
     }
 
+    @GetMapping("/buscarPorId/{id}")
+    public ResponseEntity<ControllerResponse> buscarPorId(@PathVariable long id) {
+        ControllerResponse controllerResponse = new ControllerResponse();
+        ServiceResponse serviceResponse = usuarioService.buscarPorId(id);
+        controllerResponse.setStatus(serviceResponse.getStatus());
+        controllerResponse.setMessage(serviceResponse.getMessage());
+        controllerResponse.setData(serviceResponse.getData());
+        return ResponseEntity.ok(controllerResponse);
+    }
+
     @PostMapping("/registrar")
     public ResponseEntity<ControllerResponse> registrar(@RequestBody Usuario usuario) {
         ControllerResponse controllerResponse = new ControllerResponse();
@@ -44,6 +54,7 @@ public class UsuarioController {
         controllerResponse.setData(serviceResponse.getData());
         return ResponseEntity.ok(controllerResponse);
     }
+
     @DeleteMapping("/eliminar/{id}")
     public ResponseEntity<ControllerResponse> eliminar(@PathVariable long id) {
         ControllerResponse controllerResponse = new ControllerResponse();
