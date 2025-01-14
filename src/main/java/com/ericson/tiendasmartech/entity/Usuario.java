@@ -17,11 +17,15 @@ public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "id_usuario")
+    private long id;
+
+    @Enumerated(EnumType.STRING)
     private Documento documento;
+    private String numero;
 
     @ManyToOne
-    @JoinColumn(name = "rol")
+    @JoinColumn(name = "id_rol")
     private Rol rol;
 
     private String nombres;
@@ -34,9 +38,4 @@ public class Usuario {
     private Date actualizacion;
     private boolean estado;
 
-    @PrePersist
-    public void prePersist(){
-        actualizacion = new Date();
-        estado = true;
-    }
 }
