@@ -11,7 +11,6 @@ import com.ericson.tiendasmartech.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,6 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final RolRepository rolRepository;
 
     @Override
-    @Transactional
     public ServiceResponse registrar(Usuario usuario) {
         ServiceResponse response = new ServiceResponse();
         try {
@@ -69,6 +67,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         usuario.getNombres(),
                         usuario.getApellidos(),
                         new RolDto(usuario.getRol().getId(), usuario.getRol().getNombre()),
+                        usuario.getEmail(),
                         usuario.getTelefono(),
                         usuario.getDireccion(),
                         usuario.getNacimiento());
@@ -126,6 +125,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                         usuario.getNombres(),
                         usuario.getApellidos(),
                         new RolDto(usuario.getRol().getId(), usuario.getRol().getNombre()),
+                        usuario.getEmail(),
                         usuario.getTelefono(),
                         usuario.getDireccion(),
                         usuario.getNacimiento()

@@ -1,6 +1,5 @@
 package com.ericson.tiendasmartech.entity;
 
-import com.ericson.tiendasmartech.enums.Documento;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,41 +11,38 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "usuarios")
-public class Usuario {
-
+@Table(name = "productos")
+public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Enumerated(EnumType.STRING)
-    private Documento documento;
-    private String numero;
+    @ManyToOne
+    @JoinColumn(name = "categoria")
+    private Categoria categoria;
 
     @ManyToOne
-    @JoinColumn(name = "rol")
-    private Rol rol;
+    @JoinColumn(name = "usuario")
+    private Usuario usuario;
 
-    private String nombres;
-    private String apellidos;
-    private String email;
-    private String telefono;
-    private String direccion;
-    private String password;
-    private Date nacimiento;
-    private Date actualiza;
+    private String nombre;
+    private String descripcion;
+    private String imagen;
+    private Double precio;
+    private int stock;
     private Date registro;
+    private Date actualiza;
     private boolean estado;
 
     @PrePersist
-    public void prePersist() {
+    public void prePersist(){
         registro = new Date();
         actualiza = new Date();
         estado = true;
     }
 
     @PreUpdate
-    public void preUpdate() {
+    public void preUpdate(){
         actualiza = new Date();
     }
 }

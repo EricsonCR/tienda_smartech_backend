@@ -17,6 +17,7 @@ public class UsuarioDto {
     private String nombres;
     private String apellidos;
     private RolDto rol;
+    private String email;
     private String telefono;
     private String direccion;
     private Date nacimiento;

@@ -11,13 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "roles")
-public class Rol {
+@Table(name = "categorias")
+public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String nombre;
 
-//    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
-//    private List<Usuario> usuarios;
+//    @OneToMany(mappedBy = "categoria",fetch = FetchType.LAZY)
+//    private List<Producto> productos;
 }
