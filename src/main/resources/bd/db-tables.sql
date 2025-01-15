@@ -53,7 +53,25 @@ create table productos(
     on delete set null on update set null
 );
 
+drop table if exists clientes;
+create table clientes(
+	id int primary key auto_increment,
+    documento enum('DNI', 'CEXT'),
+    numero varchar(20) unique,
+    nombres varchar(50),
+    apellidos varchar(50),
+    telefono varchar(20),
+    direccion varchar(50),
+    email varchar(50) unique,
+    password varchar(255),
+    nacimiento date,
+    registro date,
+    actualiza date,
+    estado bit
+);
+
 select * from usuarios;
 select * from roles;
-select * from categorias order by id;
+select * from categorias;
 select * from productos;
+select * from clientes;

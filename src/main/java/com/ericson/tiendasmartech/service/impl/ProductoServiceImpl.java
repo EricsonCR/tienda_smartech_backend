@@ -32,20 +32,7 @@ public class ProductoServiceImpl implements ProductoService {
         List<ProductoDto> listaProductos = new ArrayList<>();
         try {
             List<Producto> lista = productoRepository.findAll();
-            for (Producto producto : lista) {
-                ProductoDto productoDto = new ProductoDto(
-                        producto.getId(),
-                        new CategoriaDto(producto.getCategoria().getId(), producto.getCategoria().getNombre()),
-                        producto.getUsuario().getEmail(),
-                        producto.getNombre(),
-                        producto.getDescripcion(),
-                        producto.getImagen(),
-                        producto.getPrecio(),
-                        producto.getStock(),
-                        producto.isEstado()
-                );
-                listaProductos.add(productoDto);
-            }
+            for (Producto producto : lista) listaProductos.add(entityToDto(producto));
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Productos listados exitosamente");
             response.setData(listaProductos);
@@ -79,7 +66,7 @@ public class ProductoServiceImpl implements ProductoService {
             else producto.setCategoria(optionalCategoria.get());
 
             productoRepository.save(producto);
-            response.setStatus(HttpStatus.CREATED.value());
+            response.setStatus(HttpStatus.OK.value());
             response.setMessage("Producto creado exitosamente");
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -152,18 +139,7 @@ public class ProductoServiceImpl implements ProductoService {
         try {
             Optional<Producto> optional = productoRepository.findById(id);
             if (optional.isPresent()) {
-                Producto producto = optional.get();
-                ProductoDto productoDto = new ProductoDto(
-                        producto.getId(),
-                        new CategoriaDto(producto.getCategoria().getId(), producto.getCategoria().getNombre()),
-                        producto.getUsuario().getEmail(),
-                        producto.getNombre(),
-                        producto.getDescripcion(),
-                        producto.getImagen(),
-                        producto.getPrecio(),
-                        producto.getStock(),
-                        producto.isEstado()
-                );
+                ProductoDto productoDto = entityToDto(optional.get());
                 response.setStatus(HttpStatus.OK.value());
                 response.setMessage("Producto encontrado exitosamente");
                 response.setData(productoDto);
@@ -176,5 +152,19 @@ public class ProductoServiceImpl implements ProductoService {
             response.setMessage("Error al buscar");
         }
         return response;
+    }
+
+    private ProductoDto entityToDto(Producto producto) {
+        return new ProductoDto(
+                producto.getId(),
+                new CategoriaDto(producto.getCategoria().getId(), producto.getCategoria().getNombre()),
+                producto.getUsuario().getEmail(),
+                producto.getNombre(),
+                producto.getDescripcion(),
+                producto.getImagen(),
+                producto.getPrecio(),
+                producto.getStock(),
+                producto.isEstado()
+        );
     }
 }
