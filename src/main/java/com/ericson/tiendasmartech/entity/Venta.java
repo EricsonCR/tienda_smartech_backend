@@ -1,6 +1,7 @@
 package com.ericson.tiendasmartech.entity;
 
-import com.ericson.tiendasmartech.enums.Documento;
+import com.ericson.tiendasmartech.enums.EstadoVenta;
+import com.ericson.tiendasmartech.enums.MetodoPago;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,36 +14,42 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "clientes")
-public class Cliente {
+@Table(name = "ventas")
+public class Venta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Enumerated(EnumType.STRING)
-    private Documento documento;
+    private Double total;
+    private Double descuento;
+    private Double impuesto;
 
-    private String numero;
-    private String nombres;
-    private String apellidos;
-    private String telefono;
-    private String direccion;
-    private String email;
-    private String password;
-    private Date nacimiento;
+    @Enumerated(EnumType.STRING)
+    private MetodoPago metodo;
+
+    @Enumerated(EnumType.STRING)
+    private EstadoVenta estado;
+
+    private String comentarios;
+
     @Column(updatable = false)
     private Date registro;
-    private Date actualiza;
-    private boolean estado;
 
-//    @OneToMany(mappedBy = "cliente")
-//    private List<Venta> ventas;
+    private Date actualiza;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente")
+    private Cliente cliente;
+
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<VentaDetalle> ventaDetalle;
 
     @PrePersist
     public void prePersist() {
         registro = new Date();
         actualiza = new Date();
-        estado = true;
+        estado = EstadoVenta.PENDIENTE;
     }
 
     @PreUpdate

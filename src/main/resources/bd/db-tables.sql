@@ -70,8 +70,56 @@ create table clientes(
     estado bit
 );
 
+drop table if exists ventas;
+create table ventas(
+	id int primary key auto_increment,
+    cliente int,
+    total decimal(6,2),
+    descuento decimal(6,2),
+    impuesto decimal(6,2),
+    metodo enum('EFECTIVO', 'BCP','INTERBANK', 'BBVA', 'YAPE', 'PLIN'),
+    estado enum('PENDIENTE','PAGADO','ANULADO'),
+    comentarios varchar(255),
+    registro date,
+    actualiza date,
+    foreign key (cliente) references clientes(id)
+    on delete set null on update set null
+);
+
+drop table if exists venta_detalles;
+create table venta_detalles(
+	id int primary key auto_increment,
+    venta int,
+    producto int,
+    cantidad int,
+    precio decimal(6,2),
+    total decimal(6,2),
+    descuento decimal(6,2),
+    impuesto decimal(6,2),
+    comentarios varchar(50),
+    medida enum('UND','DOC','BLS','CAJ','PQT','CTO', 'MIL'),
+    foreign key (venta) references ventas(id)
+    on delete set null on update set null,
+    foreign key (producto) references productos(id)
+    on delete set null on update set null
+);
+
+/*
+truncate table ventas;
+truncate table venta_detalles;
+truncate table clientes;
+delete from ventas where cliente = 2;
+delete from clientes where id = 2;
+
+set foreign_key_checks = 0;
+drop table if exists ventas;
+set foreign_key_checks = 1;
+
+*/
 select * from usuarios;
 select * from roles;
 select * from categorias;
 select * from productos;
 select * from clientes;
+select * from ventas;
+select * from venta_detalles;

@@ -36,6 +36,7 @@ public class Usuario {
     private String password;
     private Date nacimiento;
     private Date actualiza;
+    @Column(updatable = false)
     private Date registro;
     private boolean estado;
 

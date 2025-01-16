@@ -30,6 +30,8 @@ public class Producto {
     private String imagen;
     private Double precio;
     private int stock;
+
+    @Column(updatable = false)
     private Date registro;
     private Date actualiza;
     private boolean estado;
