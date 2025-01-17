@@ -2,13 +2,10 @@ package com.ericson.tiendasmartech.service.impl;
 
 import com.ericson.tiendasmartech.dto.VentaDetalleDto;
 import com.ericson.tiendasmartech.dto.VentaDto;
-import com.ericson.tiendasmartech.entity.Cliente;
-import com.ericson.tiendasmartech.entity.Producto;
-import com.ericson.tiendasmartech.entity.Venta;
-import com.ericson.tiendasmartech.entity.VentaDetalle;
+import com.ericson.tiendasmartech.entity.*;
 import com.ericson.tiendasmartech.model.ServiceResponse;
-import com.ericson.tiendasmartech.repository.ClienteRepository;
 import com.ericson.tiendasmartech.repository.ProductoRepository;
+import com.ericson.tiendasmartech.repository.UsuarioRepository;
 import com.ericson.tiendasmartech.repository.VentaRepository;
 import com.ericson.tiendasmartech.service.VentaService;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +20,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class VentaServiceImpl implements VentaService {
     private final VentaRepository ventaRepository;
-    private final ClienteRepository clienteRepository;
     private final ProductoRepository productoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
     public ServiceResponse registrar(VentaDto ventaDto) {
@@ -32,7 +29,7 @@ public class VentaServiceImpl implements VentaService {
         boolean flagProducto = true;
         try {
             Venta venta = dtoToEntity(ventaDto);
-            if (clienteRepository.existsById(venta.getCliente().getId())) {
+            if (usuarioRepository.existsById(venta.getUsuario().getId())) {
                 for (VentaDetalle ventaDetalle : venta.getVentaDetalle()) {
                     long id = ventaDetalle.getProducto().getId();
                     if (productoRepository.existsById(id)) ventaDetalle.setVenta(venta);
@@ -48,7 +45,7 @@ public class VentaServiceImpl implements VentaService {
                 }
             } else {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage("Cliente no encontrado");
+                response.setMessage("Usuario no encontrado");
             }
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -80,6 +77,12 @@ public class VentaServiceImpl implements VentaService {
         boolean flagProducto = true;
         try {
             Venta venta = dtoToEntity(ventaDto);
+            Optional<Usuario> optionaUsuario = usuarioRepository.findById(venta.getUsuario().getId());
+            if (optionaUsuario.isEmpty()) {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Usuario no encontrado");
+                return response;
+            }
             Optional<Venta> optional = ventaRepository.findById(venta.getId());
             if (optional.isPresent()) {
                 for (VentaDetalle ventaDetalle : venta.getVentaDetalle()) {
@@ -144,7 +147,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     private Venta dtoToEntity(VentaDto ventaDto) {
-        Cliente cliente = clienteRepository.findById(ventaDto.getClienteId()).orElse(new Cliente());
+        Usuario usuario = usuarioRepository.findById(ventaDto.getUsuarioId()).orElse(new Usuario());
         List<VentaDetalle> listaVentaDetalle = new ArrayList<>();
         ventaDto.getVentaDetalle().forEach(ventaDetalleDto -> {
             Producto producto = productoRepository.findById(ventaDetalleDto.getProductoId()).orElse(new Producto());
@@ -172,7 +175,7 @@ public class VentaServiceImpl implements VentaService {
                 ventaDto.getComentarios(),
                 ventaDto.getRegistro(),
                 ventaDto.getActualiza(),
-                cliente,
+                usuario,
                 listaVentaDetalle
         );
     }
@@ -196,7 +199,7 @@ public class VentaServiceImpl implements VentaService {
         });
         return new VentaDto(
                 venta.getId(),
-                venta.getCliente().getId(),
+                venta.getUsuario().getId(),
                 venta.getTotal(),
                 venta.getDescuento(),
                 venta.getImpuesto(),

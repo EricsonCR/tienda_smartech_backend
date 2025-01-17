@@ -1,6 +1,7 @@
 package com.ericson.tiendasmartech.entity;
 
 import com.ericson.tiendasmartech.enums.Documento;
+import com.ericson.tiendasmartech.enums.Rol;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +25,7 @@ public class Usuario {
 
     private String numero;
 
-    @ManyToOne
-    @JoinColumn(name = "rol")
+    @Enumerated(EnumType.STRING)
     private Rol rol;
 
     private String nombres;
@@ -36,8 +36,10 @@ public class Usuario {
     private String password;
     private Date nacimiento;
     private Date actualiza;
+
     @Column(updatable = false)
     private Date registro;
+
     private boolean estado;
 
     @PrePersist

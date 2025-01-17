@@ -39,8 +39,8 @@ public class Venta {
     private Date actualiza;
 
     @ManyToOne
-    @JoinColumn(name = "cliente")
-    private Cliente cliente;
+    @JoinColumn(name = "usuario")
+    private Usuario usuario;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VentaDetalle> ventaDetalle;

@@ -33,18 +33,19 @@ public class Producto {
 
     @Column(updatable = false)
     private Date registro;
+
     private Date actualiza;
     private boolean estado;
 
     @PrePersist
-    public void prePersist(){
+    public void prePersist() {
         registro = new Date();
         actualiza = new Date();
         estado = true;
     }
 
     @PreUpdate
-    public void preUpdate(){
+    public void preUpdate() {
         actualiza = new Date();
     }
 }

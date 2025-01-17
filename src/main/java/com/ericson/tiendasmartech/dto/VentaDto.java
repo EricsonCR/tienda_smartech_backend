@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class VentaDto {
     private long id;
-    private long clienteId;
+    private long usuarioId;
     private Double total;
     private Double descuento;
     private Double impuesto;

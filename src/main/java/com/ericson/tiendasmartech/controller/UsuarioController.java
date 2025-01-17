@@ -1,6 +1,6 @@
 package com.ericson.tiendasmartech.controller;
 
-import com.ericson.tiendasmartech.entity.Usuario;
+import com.ericson.tiendasmartech.dto.UsuarioDto;
 import com.ericson.tiendasmartech.model.ControllerResponse;
 import com.ericson.tiendasmartech.model.ServiceResponse;
 import com.ericson.tiendasmartech.service.UsuarioService;
@@ -36,9 +36,9 @@ public class UsuarioController {
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity<ControllerResponse> registrar(@RequestBody Usuario usuario) {
+    public ResponseEntity<ControllerResponse> registrar(@RequestBody UsuarioDto usuarioDto) {
         ControllerResponse controllerResponse = new ControllerResponse();
-        ServiceResponse serviceResponse = usuarioService.registrar(usuario);
+        ServiceResponse serviceResponse = usuarioService.registrar(usuarioDto);
         controllerResponse.setStatus(serviceResponse.getStatus());
         controllerResponse.setMessage(serviceResponse.getMessage());
         controllerResponse.setData(serviceResponse.getData());
@@ -46,9 +46,9 @@ public class UsuarioController {
     }
 
     @PutMapping("/actualizar")
-    public ResponseEntity<ControllerResponse> actualizar(@RequestBody Usuario usuario) {
+    public ResponseEntity<ControllerResponse> actualizar(@RequestBody UsuarioDto usuarioDto) {
         ControllerResponse controllerResponse = new ControllerResponse();
-        ServiceResponse serviceResponse = usuarioService.actualizar(usuario);
+        ServiceResponse serviceResponse = usuarioService.actualizar(usuarioDto);
         controllerResponse.setStatus(serviceResponse.getStatus());
         controllerResponse.setMessage(serviceResponse.getMessage());
         controllerResponse.setData(serviceResponse.getData());

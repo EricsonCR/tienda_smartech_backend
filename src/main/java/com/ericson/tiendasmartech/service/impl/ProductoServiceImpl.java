@@ -38,15 +38,16 @@ public class ProductoServiceImpl implements ProductoService {
             response.setData(listaProductos);
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage("Error al listar");
+            response.setMessage("Error al listar: " + e.getMessage());
         }
         return response;
     }
 
     @Override
-    public ServiceResponse registrar(Producto producto) {
+    public ServiceResponse registrar(ProductoDto productoDto) {
         ServiceResponse response = new ServiceResponse();
         try {
+            Producto producto = dtoToEntity(productoDto);
             Optional<Producto> optionalProducto = productoRepository.findByNombre(producto.getNombre());
             if (optionalProducto.isPresent()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -62,34 +63,28 @@ public class ProductoServiceImpl implements ProductoService {
             } else producto.setUsuario(optionalUsuario.get());
 
             Optional<Categoria> optionalCategoria = categoriaRepository.findByNombre(producto.getCategoria().getNombre());
-            if (optionalCategoria.isEmpty()) categoriaRepository.save(producto.getCategoria());
-            else producto.setCategoria(optionalCategoria.get());
+            if (optionalCategoria.isPresent()) producto.setCategoria(optionalCategoria.get());
+            else categoriaRepository.save(producto.getCategoria());
 
             productoRepository.save(producto);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Producto creado exitosamente");
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage("Error al registrar");
+            response.setMessage("Error al registrar: " + e.getMessage());
         }
         return response;
     }
 
     @Override
-    public ServiceResponse actualizar(Producto producto) {
+    public ServiceResponse actualizar(ProductoDto productoDto) {
         ServiceResponse response = new ServiceResponse();
         try {
+            Producto producto = dtoToEntity(productoDto);
             Optional<Producto> optionalProducto = productoRepository.findById(producto.getId());
             if (optionalProducto.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage("El producto no existe");
-                return response;
-            }
-
-            Optional<Categoria> optionalCategoria = categoriaRepository.findByNombre(producto.getCategoria().getNombre());
-            if (optionalCategoria.isEmpty()) {
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage("La categoria no existe");
                 return response;
             }
 
@@ -100,15 +95,17 @@ public class ProductoServiceImpl implements ProductoService {
                 return response;
             }
 
-            producto.setUsuario(optionalUsuario.get());
-            producto.setCategoria(optionalCategoria.get());
+            Optional<Categoria> optionalCategoria = categoriaRepository.findByNombre(producto.getCategoria().getNombre());
+            if (optionalCategoria.isPresent()) producto.setCategoria(optionalCategoria.get());
+            else categoriaRepository.save(producto.getCategoria());
+
             productoRepository.save(producto);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Producto actualizado exitosamente");
 
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage("Error al actualizar");
+            response.setMessage("Error al actualizar: " + e.getMessage());
         }
         return response;
     }
@@ -149,9 +146,29 @@ public class ProductoServiceImpl implements ProductoService {
             }
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage("Error al buscar");
+            response.setMessage("Error al buscar: " + e.getMessage());
         }
         return response;
+    }
+
+    private Producto dtoToEntity(ProductoDto productoDto) {
+        String nombre = productoDto.getCategoria().getNombre();
+        String email = productoDto.getUsuarioEmail();
+        Categoria categoria = categoriaRepository.findByNombre(nombre).orElse(new Categoria(0, nombre));
+        Usuario usuario = usuarioRepository.findByEmail(email).orElse(new Usuario());
+        return new Producto(
+                productoDto.getId(),
+                categoria,
+                usuario,
+                productoDto.getNombre(),
+                productoDto.getDescripcion(),
+                productoDto.getImagen(),
+                productoDto.getPrecio(),
+                productoDto.getStock(),
+                null,
+                null,
+                productoDto.isEstado()
+        );
     }
 
     private ProductoDto entityToDto(Producto producto) {

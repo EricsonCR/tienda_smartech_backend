@@ -1,16 +1,10 @@
 create database tienda_smartech;
 use tienda_smartech;
 
-drop table if exists roles;
-create table roles(
-	id int primary key auto_increment,
-    nombre varchar(20) unique
-);
-
 drop table if exists usuarios;
 create table usuarios(
 	id int primary key auto_increment,
-    rol int,
+    rol enum('ADMIN','USER','CLIENTE','INVITED'),
     documento enum('DNI', 'CEXT'),
     numero varchar(20) unique,
     nombres varchar(50),
@@ -22,10 +16,7 @@ create table usuarios(
     nacimiento date,
     registro date,
     actualiza date,
-    estado bit,
-    foreign key (rol)  references roles(id)
-    on delete set null
-    on update set null
+    estado bit
 );
 
 drop table if exists categorias;
@@ -53,27 +44,10 @@ create table productos(
     on delete set null on update set null
 );
 
-drop table if exists clientes;
-create table clientes(
-	id int primary key auto_increment,
-    documento enum('DNI', 'CEXT'),
-    numero varchar(20) unique,
-    nombres varchar(50),
-    apellidos varchar(50),
-    telefono varchar(20),
-    direccion varchar(50),
-    email varchar(50) unique,
-    password varchar(255),
-    nacimiento date,
-    registro date,
-    actualiza date,
-    estado bit
-);
-
 drop table if exists ventas;
 create table ventas(
 	id int primary key auto_increment,
-    cliente int,
+    usuario int,
     total decimal(6,2),
     descuento decimal(6,2),
     impuesto decimal(6,2),
@@ -82,7 +56,7 @@ create table ventas(
     comentarios varchar(255),
     registro date,
     actualiza date,
-    foreign key (cliente) references clientes(id)
+    foreign key (usuario) references usuarios(id)
     on delete set null on update set null
 );
 
@@ -105,9 +79,13 @@ create table venta_detalles(
 );
 
 /*
+use test;
+drop database tienda_smartech;
+
 truncate table ventas;
 truncate table venta_detalles;
 truncate table clientes;
+
 delete from ventas where cliente = 2;
 delete from clientes where id = 2;
 
@@ -115,11 +93,14 @@ set foreign_key_checks = 0;
 drop table if exists ventas;
 set foreign_key_checks = 1;
 
+update categorias
+set nombre = 'ram'
+where id = 2;
+
 */
+
 select * from usuarios;
-select * from roles;
-select * from categorias;
+select * from categorias order by id;
 select * from productos;
-select * from clientes;
 select * from ventas;
 select * from venta_detalles;

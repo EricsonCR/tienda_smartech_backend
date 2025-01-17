@@ -1,14 +1,15 @@
 package com.ericson.tiendasmartech.service;
 
+import com.ericson.tiendasmartech.dto.ProductoDto;
 import com.ericson.tiendasmartech.entity.Producto;
 import com.ericson.tiendasmartech.model.ServiceResponse;
 
 public interface ProductoService {
     ServiceResponse listar();
 
-    ServiceResponse registrar(Producto producto);
+    ServiceResponse registrar(ProductoDto productoDto);
 
-    ServiceResponse actualizar(Producto producto);
+    ServiceResponse actualizar(ProductoDto productoDto);
 
     ServiceResponse eliminar(Long id);
 

@@ -1,7 +1,6 @@
 package com.ericson.tiendasmartech.controller;
 
 import com.ericson.tiendasmartech.dto.VentaDto;
-import com.ericson.tiendasmartech.entity.Venta;
 import com.ericson.tiendasmartech.model.ControllerResponse;
 import com.ericson.tiendasmartech.model.ServiceResponse;
 import com.ericson.tiendasmartech.service.VentaService;

@@ -18,6 +18,11 @@ public class Categoria {
     private long id;
     private String nombre;
 
-//    @OneToMany(mappedBy = "categoria",fetch = FetchType.LAZY)
+    @PrePersist
+    public void prePersist(){
+        nombre = nombre.toUpperCase();
+    }
+
+//    @OneToMany(mappedBy = "categoria")
 //    private List<Producto> productos;
 }

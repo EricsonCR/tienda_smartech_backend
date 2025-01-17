@@ -1,11 +1,8 @@
 package com.ericson.tiendasmartech.service.impl;
 
-import com.ericson.tiendasmartech.dto.RolDto;
 import com.ericson.tiendasmartech.dto.UsuarioDto;
-import com.ericson.tiendasmartech.entity.Rol;
 import com.ericson.tiendasmartech.entity.Usuario;
 import com.ericson.tiendasmartech.model.ServiceResponse;
-import com.ericson.tiendasmartech.repository.RolRepository;
 import com.ericson.tiendasmartech.repository.UsuarioRepository;
 import com.ericson.tiendasmartech.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +18,12 @@ import java.util.Optional;
 public class UsuarioServiceImpl implements UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-    private final RolRepository rolRepository;
 
     @Override
-    public ServiceResponse registrar(Usuario usuario) {
+    public ServiceResponse registrar(UsuarioDto usuarioDto) {
         ServiceResponse response = new ServiceResponse();
         try {
+            Usuario usuario = dtoToEntity(usuarioDto);
             Optional<Usuario> usuarioEmail = usuarioRepository.findByEmail(usuario.getEmail());
             Optional<Usuario> usuarioNumero = usuarioRepository.findByNumero(usuario.getNumero());
             if (usuarioEmail.isPresent()) {
@@ -39,10 +36,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 response.setMessage("El numero de documento ya existe");
                 return response;
             }
-
-            Optional<Rol> rolExistente = rolRepository.findByNombre(usuario.getRol().getNombre());
-            if (rolExistente.isPresent()) usuario.setRol(rolExistente.get());
-            else rolRepository.save(usuario.getRol());
 
             usuarioRepository.save(usuario);
             response.setStatus(HttpStatus.OK.value());
@@ -60,17 +53,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         List<UsuarioDto> lista = new ArrayList<>();
         try {
             for (Usuario usuario : usuarioRepository.findAll()) {
-                UsuarioDto usuarioDto = new UsuarioDto(
-                        usuario.getId(),
-                        usuario.getDocumento(),
-                        usuario.getNumero(),
-                        usuario.getNombres(),
-                        usuario.getApellidos(),
-                        new RolDto(usuario.getRol().getId(), usuario.getRol().getNombre()),
-                        usuario.getEmail(),
-                        usuario.getTelefono(),
-                        usuario.getDireccion(),
-                        usuario.getNacimiento());
+                UsuarioDto usuarioDto = entityToDto(usuario);
                 lista.add(usuarioDto);
             }
             response.setStatus(HttpStatus.OK.value());
@@ -84,23 +67,16 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public ServiceResponse actualizar(Usuario usuario) {
+    public ServiceResponse actualizar(UsuarioDto usuarioDto) {
         ServiceResponse response = new ServiceResponse();
         try {
+            Usuario usuario = dtoToEntity(usuarioDto);
             Optional<Usuario> usuarioEmail = usuarioRepository.findByEmail(usuario.getEmail());
-            Optional<Rol> rolExistente = rolRepository.findByNombre(usuario.getRol().getNombre());
             if (usuarioEmail.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage("El email no existe");
                 return response;
             }
-            if (rolExistente.isEmpty()) {
-                response.setStatus(HttpStatus.BAD_REQUEST.value());
-                response.setMessage("El rol no existe");
-                return response;
-            }
-
-            usuario.setRol(rolExistente.get());
             usuarioRepository.save(usuario);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Usuario actualizado correctamente");
@@ -117,19 +93,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         try {
             Optional<Usuario> optional = usuarioRepository.findById(id);
             if (optional.isPresent()) {
-                Usuario usuario = optional.get();
-                UsuarioDto usuarioDto = new UsuarioDto(
-                        usuario.getId(),
-                        usuario.getDocumento(),
-                        usuario.getNumero(),
-                        usuario.getNombres(),
-                        usuario.getApellidos(),
-                        new RolDto(usuario.getRol().getId(), usuario.getRol().getNombre()),
-                        usuario.getEmail(),
-                        usuario.getTelefono(),
-                        usuario.getDireccion(),
-                        usuario.getNacimiento()
-                );
+                UsuarioDto usuarioDto = entityToDto(optional.get());
                 response.setStatus(HttpStatus.OK.value());
                 response.setMessage("Usuario encontrado correctamente");
                 response.setData(usuarioDto);
@@ -164,6 +128,40 @@ public class UsuarioServiceImpl implements UsuarioService {
             response.setMessage("Error al eliminar el usuario");
         }
         return response;
+    }
+
+    private Usuario dtoToEntity(UsuarioDto usuarioDto) {
+        return new Usuario(
+                usuarioDto.getId(),
+                usuarioDto.getDocumento(),
+                usuarioDto.getNumero(),
+                usuarioDto.getRol(),
+                usuarioDto.getNombres(),
+                usuarioDto.getApellidos(),
+                usuarioDto.getEmail(),
+                usuarioDto.getTelefono(),
+                usuarioDto.getDireccion(),
+                "",
+                usuarioDto.getNacimiento(),
+                null,
+                null,
+                usuarioDto.isEstado()
+        );
+    }
+
+    private UsuarioDto entityToDto(Usuario usuario) {
+        return new UsuarioDto(
+                usuario.getId(),
+                usuario.getDocumento(),
+                usuario.getNumero(),
+                usuario.getNombres(),
+                usuario.getApellidos(),
+                usuario.getRol(),
+                usuario.getEmail(),
+                usuario.getTelefono(),
+                usuario.getDireccion(),
+                usuario.getNacimiento(),
+                usuario.isEstado());
     }
 
 }

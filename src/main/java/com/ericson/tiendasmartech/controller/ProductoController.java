@@ -1,5 +1,6 @@
 package com.ericson.tiendasmartech.controller;
 
+import com.ericson.tiendasmartech.dto.ProductoDto;
 import com.ericson.tiendasmartech.entity.Producto;
 import com.ericson.tiendasmartech.model.ControllerResponse;
 import com.ericson.tiendasmartech.model.ServiceResponse;
@@ -26,9 +27,9 @@ public class ProductoController {
     }
 
     @PostMapping("/registrar")
-    public ResponseEntity<ControllerResponse> registrar(@RequestBody Producto producto) {
+    public ResponseEntity<ControllerResponse> registrar(@RequestBody ProductoDto productoDto) {
         ControllerResponse response = new ControllerResponse();
-        ServiceResponse serviceResponse = productoService.registrar(producto);
+        ServiceResponse serviceResponse = productoService.registrar(productoDto);
         response.setStatus(serviceResponse.getStatus());
         response.setMessage(serviceResponse.getMessage());
         response.setData(serviceResponse.getData());
@@ -46,9 +47,9 @@ public class ProductoController {
     }
 
     @PutMapping("/actualizar")
-    public ResponseEntity<ControllerResponse> actualizar(@RequestBody Producto producto) {
+    public ResponseEntity<ControllerResponse> actualizar(@RequestBody ProductoDto productoDto) {
         ControllerResponse response = new ControllerResponse();
-        ServiceResponse serviceResponse = productoService.actualizar(producto);
+        ServiceResponse serviceResponse = productoService.actualizar(productoDto);
         response.setStatus(serviceResponse.getStatus());
         response.setMessage(serviceResponse.getMessage());
         response.setData(serviceResponse.getData());
