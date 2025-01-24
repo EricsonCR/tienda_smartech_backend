@@ -1,7 +1,6 @@
 package com.ericson.tiendasmartech.service.impl;
 
 import com.ericson.tiendasmartech.dto.AuthDto;
-import com.ericson.tiendasmartech.dto.UserDetailsDto;
 import com.ericson.tiendasmartech.entity.Usuario;
 import com.ericson.tiendasmartech.enums.Rol;
 import com.ericson.tiendasmartech.model.ServiceResponse;
@@ -14,16 +13,20 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public ServiceResponse login(AuthDto authDto) {
@@ -38,8 +41,9 @@ public class AuthServiceImpl implements AuthService {
                     new UsernamePasswordAuthenticationToken(authDto.getEmail(), authDto.getPassword());
             Authentication auth = authenticationManager.authenticate(authToken);
             SecurityContextHolder.getContext().setAuthentication(auth);
-            UserDetailsDto userDetailsDto = new UserDetailsDto(authDto.getEmail(), authDto.getPassword());
-            String token = jwtService.getToken(userDetailsDto);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(authDto.getEmail());
+            String token = jwtService.getToken(userDetails);
+
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Usuario autenticado exitosamente");
             response.setData(token);
@@ -56,12 +60,12 @@ public class AuthServiceImpl implements AuthService {
         try {
             if (usuarioRepository.existsByEmail(authDto.getEmail())) {
                 response.setStatus(HttpStatus.CONFLICT.value());
-                response.setMessage("Email ya registrado");
+                response.setMessage("Email ya pertenece a otro usuario");
                 return response;
             }
             if (usuarioRepository.existsByNumero(authDto.getNumero())) {
                 response.setStatus(HttpStatus.CONFLICT.value());
-                response.setMessage("Numero ya registrado");
+                response.setMessage("Numero ya pertenece a otro usuario");
                 return response;
             }
             Usuario usuario = dtoToEntity(authDto);
@@ -69,10 +73,36 @@ public class AuthServiceImpl implements AuthService {
             usuarioRepository.save(usuario);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Usuario registrado exitosamente");
+            response.setData(jwtService.getToken(usuario.getEmail()));
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setMessage("Error al registrar el usuario");
         }
+        return response;
+    }
+
+    @Override
+    public ServiceResponse verifyEmail(String token) {
+        ServiceResponse response = new ServiceResponse();
+        try {
+            if (jwtService.expiredToken(token)) {
+                String email = jwtService.getUsernameToken(token);
+                if (usuarioRepository.existsByEmail(email)) {
+                    response.setStatus(HttpStatus.OK.value());
+                    response.setMessage("Usuario autenticado exitosamente");
+                } else {
+                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    response.setMessage("Usuario no existe");
+                }
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("Token expirado");
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setMessage("Error al validar el token");
+        }
+
         return response;
     }
 

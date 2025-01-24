@@ -7,4 +7,6 @@ public interface AuthService {
     ServiceResponse login(AuthDto authDto);
 
     ServiceResponse register(AuthDto authDto);
+
+    ServiceResponse verifyEmail(String token);
 }

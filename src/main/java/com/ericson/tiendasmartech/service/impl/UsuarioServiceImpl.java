@@ -2,6 +2,7 @@ package com.ericson.tiendasmartech.service.impl;
 
 import com.ericson.tiendasmartech.dto.UsuarioDto;
 import com.ericson.tiendasmartech.entity.Usuario;
+import com.ericson.tiendasmartech.enums.EstadoCuenta;
 import com.ericson.tiendasmartech.model.ServiceResponse;
 import com.ericson.tiendasmartech.repository.UsuarioRepository;
 import com.ericson.tiendasmartech.service.UsuarioService;
@@ -23,9 +24,8 @@ public class UsuarioServiceImpl implements UsuarioService {
     public ServiceResponse registrar(UsuarioDto usuarioDto) {
         ServiceResponse response = new ServiceResponse();
         try {
-            Usuario usuario = dtoToEntity(usuarioDto);
-            Optional<Usuario> usuarioEmail = usuarioRepository.findByEmail(usuario.getEmail());
-            Optional<Usuario> usuarioNumero = usuarioRepository.findByNumero(usuario.getNumero());
+            Optional<Usuario> usuarioEmail = usuarioRepository.findByEmail(usuarioDto.getEmail());
+            Optional<Usuario> usuarioNumero = usuarioRepository.findByNumero(usuarioDto.getNumero());
             if (usuarioEmail.isPresent()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage("El email ya existe");
@@ -37,6 +37,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 return response;
             }
 
+            Usuario usuario = dtoToEntity(usuarioDto);
             usuarioRepository.save(usuario);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Usuario registrado correctamente");
@@ -70,13 +71,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     public ServiceResponse actualizar(UsuarioDto usuarioDto) {
         ServiceResponse response = new ServiceResponse();
         try {
-            Usuario usuario = dtoToEntity(usuarioDto);
-            Optional<Usuario> usuarioEmail = usuarioRepository.findByEmail(usuario.getEmail());
-            if (usuarioEmail.isEmpty()) {
+            Optional<Usuario> optional = usuarioRepository.findByEmail(usuarioDto.getEmail());
+            if (optional.isEmpty()) {
                 response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage("El email no existe");
                 return response;
             }
+            Usuario usuario = dtoToEntity(usuarioDto);
             usuarioRepository.save(usuario);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Usuario actualizado correctamente");

@@ -8,4 +8,8 @@ public interface JwtService {
     String getUsernameToken(String token);
 
     Boolean validateToken(String token, UserDetails userDetails);
+
+    String getToken(String email);
+
+    Boolean expiredToken(String token);
 }

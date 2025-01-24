@@ -15,8 +15,9 @@ import java.util.function.Function;
 
 @Service
 public class JwtServiceImpl implements JwtService {
+
     private static final String SECRET_KEY = "586E3272357538782F413F4428472B4B6250655368566B597033733676397924";
-    private static final Long TOKEN_DURACION = 6_000_000L; // 10min en milisegundos
+    private static final Long TOKEN_DURACION = 3_600_000L; // 1 hora en milisegundos
 
     private Claims getAllClaims(String token) {
         return Jwts
@@ -55,6 +56,20 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
+    public String getToken(String email) {
+        return Jwts
+                .builder()
+                .setClaims(new HashMap<>())
+                .setSubject(email)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_DURACION))
+                .signWith(
+                        Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY)),
+                        SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    @Override
     public String getUsernameToken(String token) {
         return getClaim(token, Claims::getSubject);
     }
@@ -63,5 +78,10 @@ public class JwtServiceImpl implements JwtService {
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    @Override
+    public Boolean expiredToken(String token) {
+        return !isTokenExpired(token);
     }
 }
