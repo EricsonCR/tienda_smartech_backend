@@ -36,10 +36,10 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/verifyEmail/{token}")
-    public ResponseEntity<ControllerResponse> verifyEmail(@PathVariable String token) {
+    @GetMapping("/validarEmail/{token}")
+    public ResponseEntity<ControllerResponse> validarEmail(@PathVariable String token) {
         ControllerResponse response = new ControllerResponse();
-        ServiceResponse serviceResponse = authService.verifyEmail(token);
+        ServiceResponse serviceResponse = authService.validarEmail(token);
         response.setStatus(serviceResponse.getStatus());
         response.setMessage(serviceResponse.getMessage());
         response.setData(serviceResponse.getData());

@@ -1,12 +1,14 @@
 package com.ericson.tiendasmartech.service.impl;
 
 import com.ericson.tiendasmartech.dto.AuthDto;
+import com.ericson.tiendasmartech.dto.EmailDto;
 import com.ericson.tiendasmartech.entity.Usuario;
 import com.ericson.tiendasmartech.enums.Rol;
 import com.ericson.tiendasmartech.model.ServiceResponse;
 import com.ericson.tiendasmartech.repository.UsuarioRepository;
 import com.ericson.tiendasmartech.service.AuthService;
 import com.ericson.tiendasmartech.service.JwtService;
+import com.ericson.tiendasmartech.service.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UsuarioRepository usuarioRepository;
     private final UserDetailsService userDetailsService;
+    private final MailService mailService;
 
     @Override
     public ServiceResponse login(AuthDto authDto) {
@@ -73,7 +76,16 @@ public class AuthServiceImpl implements AuthService {
             usuarioRepository.save(usuario);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Usuario registrado exitosamente");
-            response.setData(jwtService.getToken(usuario.getEmail()));
+
+            EmailDto emailDto = new EmailDto();
+            emailDto.setToUser(usuario.getEmail());
+            emailDto.setSubject("Validacion de registro nuevo usuario");
+            emailDto.setBody(generatedBody(jwtService.getToken(usuario.getEmail())));
+            if (mailService.sendEmail(emailDto)) {
+                String mensaje = response.getMessage() + ", Email enviado exitosamente a: " + usuario.getEmail();
+                response.setMessage(mensaje);
+            }
+
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setMessage("Error al registrar el usuario");
@@ -81,15 +93,22 @@ public class AuthServiceImpl implements AuthService {
         return response;
     }
 
+    private String generatedBody(String token) {
+        String username = jwtService.getUsernameToken(token);
+        return "Hola " + username + ", bienvenido a nuestra tienda SmarTech.\n" +
+                "Puedes validar tu registro haciendo click al siguiente enlace:\n" +
+                "http://localhost:8080/api/auth/verifyEmail/" + token;
+    }
+
     @Override
-    public ServiceResponse verifyEmail(String token) {
+    public ServiceResponse validarEmail(String token) {
         ServiceResponse response = new ServiceResponse();
         try {
             if (jwtService.expiredToken(token)) {
                 String email = jwtService.getUsernameToken(token);
                 if (usuarioRepository.existsByEmail(email)) {
                     response.setStatus(HttpStatus.OK.value());
-                    response.setMessage("Usuario autenticado exitosamente");
+                    response.setMessage("Usuario validado exitosamente");
                 } else {
                     response.setStatus(HttpStatus.BAD_REQUEST.value());
                     response.setMessage("Usuario no existe");
