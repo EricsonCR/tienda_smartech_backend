@@ -1,7 +1,6 @@
 package com.ericson.tiendasmartech.entity;
 
 import com.ericson.tiendasmartech.enums.Documento;
-import com.ericson.tiendasmartech.enums.EstadoCuenta;
 import com.ericson.tiendasmartech.enums.Rol;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

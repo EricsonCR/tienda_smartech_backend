@@ -2,7 +2,6 @@ package com.ericson.tiendasmartech.service.impl;
 
 import com.ericson.tiendasmartech.dto.UsuarioDto;
 import com.ericson.tiendasmartech.entity.Usuario;
-import com.ericson.tiendasmartech.enums.EstadoCuenta;
 import com.ericson.tiendasmartech.model.ServiceResponse;
 import com.ericson.tiendasmartech.repository.UsuarioRepository;
 import com.ericson.tiendasmartech.service.UsuarioService;
