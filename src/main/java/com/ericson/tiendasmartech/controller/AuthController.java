@@ -45,4 +45,24 @@ public class AuthController {
         response.setData(serviceResponse.getData());
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/enviarEmailDeRegistro/{email}")
+    public ResponseEntity<ControllerResponse> enviarEmailDeRegistro(@PathVariable String email) {
+        ControllerResponse response = new ControllerResponse();
+        ServiceResponse serviceResponse = authService.enviarEmailDeRegistro(email);
+        response.setStatus(serviceResponse.getStatus());
+        response.setMessage(serviceResponse.getMessage());
+        response.setData(serviceResponse.getData());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/enviarEmailDeRecuperacion/{email}")
+    public ResponseEntity<ControllerResponse> enviarEmailDeRecuperacion(@PathVariable String email) {
+        ControllerResponse response = new ControllerResponse();
+        ServiceResponse serviceResponse = authService.enviarEmailDeRecuperacion(email);
+        response.setStatus(serviceResponse.getStatus());
+        response.setMessage(serviceResponse.getMessage());
+        response.setData(serviceResponse.getData());
+        return ResponseEntity.ok(response);
+    }
 }

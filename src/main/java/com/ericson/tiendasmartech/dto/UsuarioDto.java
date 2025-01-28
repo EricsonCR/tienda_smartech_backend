@@ -23,4 +23,5 @@ public class UsuarioDto {
     private String direccion;
     private Date nacimiento;
     private boolean estado;
+    private boolean verificado;
 }

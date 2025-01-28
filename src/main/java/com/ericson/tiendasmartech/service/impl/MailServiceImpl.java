@@ -1,6 +1,7 @@
 package com.ericson.tiendasmartech.service.impl;
 
 import com.ericson.tiendasmartech.dto.EmailDto;
+import com.ericson.tiendasmartech.service.JwtService;
 import com.ericson.tiendasmartech.service.MailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

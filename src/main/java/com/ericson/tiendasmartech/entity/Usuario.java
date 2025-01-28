@@ -42,12 +42,14 @@ public class Usuario {
     private Date registro;
 
     private boolean estado;
+    private boolean verificado;
 
     @PrePersist
     public void prePersist() {
         registro = new Date();
         actualiza = new Date();
         estado = true;
+        verificado = false;
     }
 
     @PreUpdate

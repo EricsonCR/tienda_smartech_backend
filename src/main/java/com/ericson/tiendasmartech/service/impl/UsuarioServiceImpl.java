@@ -146,7 +146,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuarioDto.getNacimiento(),
                 null,
                 null,
-                usuarioDto.isEstado()
+                usuarioDto.isEstado(),
+                usuarioDto.isVerificado()
         );
     }
 
@@ -162,7 +163,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.getTelefono(),
                 usuario.getDireccion(),
                 usuario.getNacimiento(),
-                usuario.isEstado());
+                usuario.isEstado(),
+                usuario.isVerificado());
     }
 
 }

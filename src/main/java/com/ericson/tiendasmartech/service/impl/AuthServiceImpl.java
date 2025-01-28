@@ -20,6 +20,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -36,8 +38,13 @@ public class AuthServiceImpl implements AuthService {
         ServiceResponse response = new ServiceResponse();
         try {
             if (!usuarioRepository.existsByEmail(authDto.getEmail())) {
-                response.setStatus(HttpStatus.CONFLICT.value());
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
                 response.setMessage("Email no encontrado");
+                return response;
+            }
+            if (!usuarioRepository.existsByEmailAndVerificadoIsTrue(authDto.getEmail())) {
+                response.setStatus(HttpStatus.CONFLICT.value());
+                response.setMessage("Email y Password son correctos, per el usuario no verificado");
                 return response;
             }
             UsernamePasswordAuthenticationToken authToken =
@@ -52,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
             response.setData(token);
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage("Error al autenticar el usuario");
+            response.setMessage("Error al autenticar el usuario: " + e.getMessage());
         }
         return response;
     }
@@ -76,16 +83,6 @@ public class AuthServiceImpl implements AuthService {
             usuarioRepository.save(usuario);
             response.setStatus(HttpStatus.OK.value());
             response.setMessage("Usuario registrado exitosamente");
-
-            EmailDto emailDto = new EmailDto();
-            emailDto.setToUser(usuario.getEmail());
-            emailDto.setSubject("Validacion de registro nuevo usuario");
-            emailDto.setBody(generatedBody(jwtService.getToken(usuario.getEmail())));
-            if (mailService.sendEmail(emailDto)) {
-                String mensaje = response.getMessage() + ", Email enviado exitosamente a: " + usuario.getEmail();
-                response.setMessage(mensaje);
-            }
-
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setMessage("Error al registrar el usuario");
@@ -93,11 +90,58 @@ public class AuthServiceImpl implements AuthService {
         return response;
     }
 
-    private String generatedBody(String token) {
-        String username = jwtService.getUsernameToken(token);
-        return "Hola " + username + ", bienvenido a nuestra tienda SmarTech.\n" +
-                "Puedes validar tu registro haciendo click al siguiente enlace:\n" +
-                "http://localhost:8080/api/auth/verifyEmail/" + token;
+    @Override
+    public ServiceResponse enviarEmailDeRegistro(String email) {
+        ServiceResponse response = new ServiceResponse();
+        try {
+            if (!usuarioRepository.existsByEmail(email)) {
+                response.setStatus(HttpStatus.CONFLICT.value());
+                response.setMessage("Email no encontrado");
+                return response;
+            }
+            String subject = "Validacion de registro nuevo usuario";
+            String body = generatedBodyDeRegistro(jwtService.getToken(email));
+            if (mailService.sendEmail(new EmailDto(email, subject, body, null))) {
+                response.setMessage("Email enviado exitosamente");
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setMessage("Email NO enviado");
+                response.setStatus(HttpStatus.CONFLICT.value());
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setMessage("Error al enviar el email");
+        }
+        return response;
+    }
+
+    @Override
+    public ServiceResponse enviarEmailDeRecuperacion(String email) {
+        ServiceResponse response = new ServiceResponse();
+        try {
+            if (!usuarioRepository.existsByEmail(email)) {
+                response.setStatus(HttpStatus.CONFLICT.value());
+                response.setMessage("Email no encontrado");
+                return response;
+            }
+            String password = passwordAleatorio();
+            String subject = "Recuperacion de contraseña: nuevas credenciales";
+            Usuario usuario = usuarioRepository.findByEmail(email).orElse(new Usuario());
+            String body = generatedBodyDeRecuperacion(usuario.getNombres(), password);
+            if (mailService.sendEmail(new EmailDto(email, subject, body, null))) {
+                usuario.setPassword(passwordEncoder.encode(password));
+                usuarioRepository.save(usuario);
+                response.setMessage("Email enviado exitosamente");
+                response.setStatus(HttpStatus.OK.value());
+            } else {
+                response.setMessage("Email NO enviado");
+                response.setStatus(HttpStatus.CONFLICT.value());
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setMessage("Error al enviar el email");
+        }
+        return response;
     }
 
     @Override
@@ -106,11 +150,18 @@ public class AuthServiceImpl implements AuthService {
         try {
             if (jwtService.expiredToken(token)) {
                 String email = jwtService.getUsernameToken(token);
-                if (usuarioRepository.existsByEmail(email)) {
+                if (usuarioRepository.existsByEmailAndVerificadoIsTrue(email)) {
+                    response.setStatus(HttpStatus.CONFLICT.value());
+                    response.setMessage("Email ya esta validado");
+                    return response;
+                } else if (usuarioRepository.existsByEmail(email)) {
+                    Usuario usuario = usuarioRepository.findByEmail(email).orElse(new Usuario());
+                    usuario.setVerificado(true);
+                    usuarioRepository.save(usuario);
                     response.setStatus(HttpStatus.OK.value());
                     response.setMessage("Usuario validado exitosamente");
                 } else {
-                    response.setStatus(HttpStatus.BAD_REQUEST.value());
+                    response.setStatus(HttpStatus.NOT_FOUND.value());
                     response.setMessage("Usuario no existe");
                 }
             } else {
@@ -121,8 +172,32 @@ public class AuthServiceImpl implements AuthService {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setMessage("Error al validar el token");
         }
-
         return response;
+    }
+
+    private String generatedBodyDeRecuperacion(String username, String password) {
+        return "Hola " + username + ".\n" +
+                "Esta es tu nueva contraseña temporal: " + password + "\n" +
+                "Puedes ingresar a tu cuenta temporalmente utilizando esta contraseña, " +
+                "pero recueda que debes cambiarlo por tu mayor seguridad.";
+    }
+
+    private String generatedBodyDeRegistro(String token) {
+        String username = jwtService.getUsernameToken(token);
+        return "Hola " + username + ", bienvenido a nuestra tienda SmarTech.\n" +
+                "Puedes validar tu registro haciendo click al siguiente enlace:\n" +
+                "http://localhost:8080/api/auth/validarEmail/" + token;
+    }
+
+    private String passwordAleatorio() {
+        final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 8; i++) {
+            int index = random.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(index));
+        }
+        return sb.toString();
     }
 
     private Usuario dtoToEntity(AuthDto authDto) {
@@ -140,7 +215,8 @@ public class AuthServiceImpl implements AuthService {
                 null,
                 null,
                 null,
-                true
+                true,
+                false
         );
     }
 }
