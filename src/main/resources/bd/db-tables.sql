@@ -16,7 +16,8 @@ create table usuarios(
     nacimiento date,
     registro date,
     actualiza date,
-    estado bit
+    estado bit,
+    verificado bit
 );
 
 drop table if exists categorias;
@@ -78,6 +79,39 @@ create table venta_detalles(
     on delete set null on update set null
 );
 
+drop table if exists couriers;
+create table couriers(
+	id int primary key auto_increment,
+    nombre varchar(20) unique,
+    telefono varchar(20),
+    email varchar(50),
+    direccion varchar(50)
+);
+
+drop table if exists despachos;
+create table despachos(
+	id int primary key auto_increment,
+    venta int unique,
+    usuario int,
+    courier int,
+    direccion varchar(50),
+    estado enum('PROCESANDO','ENVIADO','ENTREGADO','REEMBOLSADO','ENTREGA_FALLIDA','LISTO PARA RECOJO','DEVUELTO'),
+    comentarios varchar(50),
+    tracking varchar(50),
+    fecha_envio date,
+    fecha_entrega date,
+    hora_inicio time,
+    hora_fin time,
+    registro date,
+    actualiza date,
+    foreign key (venta) references ventas(id)
+    on delete set null on update set null,
+    foreign key (usuario) references usuarios(id)
+    on delete set null on update set null,
+    foreign key (courier) references couriers(id)
+    on delete set null on update set null
+);
+
 /*
 use test;
 drop database tienda_smartech;
@@ -104,3 +138,5 @@ select * from categorias order by id;
 select * from productos;
 select * from ventas;
 select * from venta_detalles;
+select * from couriers;
+select * from despachos;

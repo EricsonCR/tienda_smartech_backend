@@ -36,13 +36,13 @@ public class EnumController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/estadoCuenta")
-    public ResponseEntity<ControllerResponse> listarEstadoCuentas() {
+    @GetMapping("/estadoDespacho")
+    public ResponseEntity<ControllerResponse> listarEstadoDespacho() {
         ControllerResponse response = new ControllerResponse();
         ArrayList<String> lista = new ArrayList<>();
-        for (EstadoCuenta estadoCuenta : EstadoCuenta.values()) lista.add(estadoCuenta.toString());
+        for (EstadoDespacho estadoDespacho : EstadoDespacho.values()) lista.add(estadoDespacho.toString());
         response.setStatus(HttpStatus.OK.value());
-        response.setMessage("Estados cuenta encontrados");
+        response.setMessage("Estados despacho encontrados");
         response.setData(lista);
         return ResponseEntity.ok(response);
     }
