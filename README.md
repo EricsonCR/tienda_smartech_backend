@@ -2,11 +2,6 @@
 # Sistema de Comercio Electronico "SmarTech"
 Sistema web de tienda online de comercio electronico **SmartEch**.
 
-## Indice
--
--
--
-
 ## Requisitos Previos
 - **Java**: OpenJDK 21.0.3
 - **Spring Boot**: 3.4.1
@@ -19,7 +14,7 @@ Sistema web de tienda online de comercio electronico **SmartEch**.
 - JWT
 - Email
 
-## Funcionalidades
+## Tablas MySql
 - usuarios
 - Productos
 - Categorias
