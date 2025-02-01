@@ -1,6 +1,6 @@
 
 # Sistema de Comercio Electronico "SmarTech"
-...
+Sistema web de tienda online de comercio electronico **SmartEch**.
 
 ## Indice
 -
@@ -13,15 +13,18 @@
 - **MySQL**: 10.4.32-MariaDB
 - **MySQL Connector/J**: 8.0.27
 
-## Caracteristicas
--
--
--
+## Dependencias
+- Spring Security
+- Lombok
+- JWT
+- Email
 
 ## Funcionalidades
--
--
--
+- usuarios
+- Productos
+- Categorias
+- Ventas
+- Despachos
 
 ## Reglas del Negocio
 ...
