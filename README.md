@@ -9,6 +9,7 @@ Sistema web de tienda online de comercio electronico **SmarTech**.
 - **MySQL Connector/J**: 8.0.27
 
 ## Dependencias
+- Spring Jpa
 - Spring Security
 - Lombok
 - JWT
@@ -19,13 +20,5 @@ Sistema web de tienda online de comercio electronico **SmarTech**.
 - Productos
 - Categorias
 - Ventas
+- Ventas detalle
 - Despachos
-
-## Reglas del Negocio
-...
-
-## Instalacion
-...
-
-## Documentacion
-...
