@@ -22,7 +22,9 @@ public class AuthController {
         response.setStatus(serviceResponse.getStatus());
         response.setMessage(serviceResponse.getMessage());
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + serviceResponse.getData());
+        if (serviceResponse.getData() != null) {
+            headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + serviceResponse.getData());
+        }
         return ResponseEntity.ok().headers(headers).body(response);
     }
 

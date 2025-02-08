@@ -13,5 +13,7 @@ public interface UsuarioService {
 
     ServiceResponse buscarPorId(long id);
 
+    ServiceResponse buscarPorEmail(String email);
+
     ServiceResponse eliminar(long id);
 }

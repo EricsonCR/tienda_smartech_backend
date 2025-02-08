@@ -109,6 +109,28 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public ServiceResponse buscarPorEmail(String email) {
+        ServiceResponse response = new ServiceResponse();
+        try {
+            Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+            if (usuario != null) {
+                System.out.println(usuario.getNombres());
+                UsuarioDto usuarioDto = entityToDto(usuario);
+                response.setStatus(HttpStatus.OK.value());
+                response.setMessage("Usuario encontrado correctamente");
+                response.setData(usuarioDto);
+            } else {
+                response.setStatus(HttpStatus.BAD_REQUEST.value());
+                response.setMessage("El usuario no existe");
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setMessage("Error al buscar el usuario");
+        }
+        return response;
+    }
+
+    @Override
     public ServiceResponse eliminar(long id) {
         ServiceResponse response = new ServiceResponse();
         try {

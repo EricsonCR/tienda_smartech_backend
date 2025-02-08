@@ -35,6 +35,16 @@ public class UsuarioController {
         return ResponseEntity.ok(controllerResponse);
     }
 
+    @GetMapping("/buscarPorEmail/{email}")
+    public ResponseEntity<ControllerResponse> buscarPorEmail(@PathVariable String email) {
+        ControllerResponse controllerResponse = new ControllerResponse();
+        ServiceResponse serviceResponse = usuarioService.buscarPorEmail(email);
+        controllerResponse.setStatus(serviceResponse.getStatus());
+        controllerResponse.setMessage(serviceResponse.getMessage());
+        controllerResponse.setData(serviceResponse.getData());
+        return ResponseEntity.ok(controllerResponse);
+    }
+
     @PostMapping("/registrar")
     public ResponseEntity<ControllerResponse> registrar(@RequestBody UsuarioDto usuarioDto) {
         ControllerResponse controllerResponse = new ControllerResponse();

@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
             response.setData(token);
         } catch (Exception e) {
             response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setMessage("Error al autenticar el usuario: " + e.getMessage());
+            response.setMessage("Error al autenticar usuario, contraseña incorrecta");
         }
         return response;
     }
@@ -179,7 +179,7 @@ public class AuthServiceImpl implements AuthService {
         return "Hola " + username + ".\n" +
                 "Esta es tu nueva contraseña temporal: " + password + "\n" +
                 "Puedes ingresar a tu cuenta temporalmente utilizando esta contraseña, " +
-                "pero recueda que debes cambiarlo por tu mayor seguridad.";
+                "pero recuerda que debes cambiarlo por tu mayor seguridad.";
     }
 
     private String generatedBodyDeRegistro(String token) {

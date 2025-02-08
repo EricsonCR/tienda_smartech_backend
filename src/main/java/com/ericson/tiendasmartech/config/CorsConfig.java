@@ -18,7 +18,8 @@ public class CorsConfig {
                         .exposedHeaders("*");
                 registry.addMapping("/api/**")
                         .allowedOrigins("http://localhost:4200/")
-                        .allowedMethods("*");
+                        .allowedMethods("*")
+                        .allowCredentials(true);
             }
         };
     }
